@@ -497,6 +497,12 @@ namespace Microsoft.PowerShell.EditorServices.Services
                     {
                         _analysisEngineLazy.Value.Dispose();
                     }
+
+                    foreach (CorrectionTableEntry entry in _mostRecentCorrectionsByFile.Values)
+                    {
+                        entry.Dispose();
+                    }
+                    _mostRecentCorrectionsByFile.Clear();
                 }
 
                 disposedValue = true;
