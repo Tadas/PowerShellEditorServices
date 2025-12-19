@@ -348,7 +348,7 @@ namespace Microsoft.PowerShell.EditorServices.Services
             // Shouldn't start a new analysis task until:
             //  1. Delay/debounce period finishes (i.e. user has not started typing again)
             //  2. Previous analysis task finishes (runspace pool is capped at 1, so we'd be sitting in a queue there)
-            Task debounceAndPrevious = Task.WhenAll(Task.Delay(_analysisDelayMillis), previousAnalysisTask ?? Task.CompletedTask);
+            Task debounceAndPrevious = Task.WhenAll(Task.Delay(_analysisDelayMillis), previousAnalysisTask);
 
             // In parallel, we will keep an eye on our cancellation token
             Task cancellationTask = Task.Delay(Timeout.Infinite, cancellationToken);
@@ -370,7 +370,8 @@ namespace Microsoft.PowerShell.EditorServices.Services
             // Try to take the place of the currently running task by atomically writing our task in the fileAnalysisEntry.
             Task valueAtExchange = Interlocked.CompareExchange(ref fileAnalysisEntry.DiagnosticPublish, placeholder.Task, previousAnalysisTask);
 
-            if (valueAtExchange != previousAnalysisTask) {
+            if (valueAtExchange != previousAnalysisTask)
+            {
                 // Some other task has managed to jump in front of us i.e. fileAnalysisEntry.DiagnosticPublish is
                 // no longer equal to previousAnalysisTask which we noted down at the start of this method
                 _logger.LogDebug("Failed to claim the running analysis task spot");
